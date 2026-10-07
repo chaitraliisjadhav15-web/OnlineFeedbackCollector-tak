@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+
+{% block title %}Give Feedback{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="text-center mb-4">
+                    <h1 class="display-6 fw-bold">We'd love your feedback</h1>
+                    <p class="text-muted">
+                        Tell us about your experience. It only takes a minute.
+                    </p>
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="card feedback-card border-0 shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+
+                        <form action="{{ url_for('submit_feedback') }}"
+                              method="POST"
+                              id="feedbackForm">
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="name"
+                                    name="name"
+                                    placeholder="Enter your name"
+                                    required
+                                >
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="email"
+                                    name="email"
+                                    placeholder="you@example.com"
+                                    required
+                                >
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Rating</label>
+
+                                <div class="rating-options">
+                                    {% for value in range(1, 6) %}
+                                    <label class="rating-item">
+                                        <input
+                                            type="radio"
+                                            name="rating"
+                                            value="{{ value }}"
+                                            required
+                                        >
+                                        <span>{{ value }}</span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+
+                                <small class="text-muted">
+                                    1 = Very poor, 5 = Excellent
+                                </small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="comments" class="form-label">Comments</label>
+                                <textarea
+                                    class="form-control"
+                                    id="comments"
+                                    name="comments"
+                                    rows="5"
+                                    placeholder="Write your feedback here..."
+                                    required
+                                ></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">
+                                Submit Feedback
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

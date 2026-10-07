@@ -1,0 +1,162 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between
+                align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">Admin Dashboard</h1>
+            <p class="text-muted mb-0">
+                Overview of the feedback received so far.
+            </p>
+        </div>
+
+        <a href="{{ url_for('export_csv') }}" class="btn btn-success">
+            Export CSV
+        </a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <span>Total Feedback</span>
+                <strong>{{ total_feedback }}</strong>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <span>Average Rating</span>
+                <strong>{{ average_rating }}/5</strong>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <span>5 Star</span>
+                <strong>{{ rating_counts[4] }}</strong>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <span>1 Star</span>
+                <strong>{{ rating_counts[0] }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="fw-semibold mb-3">Rating Distribution</h5>
+                    <canvas id="ratingChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="fw-semibold mb-3">Quick Summary</h5>
+                    <p class="text-muted">
+                        The chart shows how many users selected each rating
+                        from 1 to 5.
+                    </p>
+
+                    <ul class="list-group list-group-flush">
+                        {% for rating in range(1, 6) %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>{{ rating }} Star</span>
+                            <strong>{{ rating_counts[rating - 1] }}</strong>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h5 class="fw-semibold mb-3">All Feedback</h5>
+
+            {% if feedback %}
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Rating</th>
+                            <th>Comments</th>
+                            <th>Date Submitted</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in feedback %}
+                        <tr>
+                            <td>{{ item["id"] }}</td>
+                            <td>{{ item["name"] }}</td>
+                            <td>{{ item["email"] }}</td>
+                            <td>
+                                <span class="badge text-bg-primary">
+                                    {{ item["rating"] }}/5
+                                </span>
+                            </td>
+                            <td>{{ item["comments"] }}</td>
+                            <td>{{ item["date_submitted"] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <p class="text-muted mb-0">
+                        No feedback has been submitted yet.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ratingCounts = {{ rating_counts | tojson }};
+
+    new Chart(document.getElementById("ratingChart"), {
+        type: "bar",
+        data: {
+            labels: ["1 Star", "2 Stars", "3 Stars", "4 Stars", "5 Stars"],
+            datasets: [{
+                label: "Number of Responses",
+                data: ratingCounts,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
